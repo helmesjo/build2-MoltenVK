@@ -1,11 +1,21 @@
 : 1
 summary: MoltenVK project repository
 
-#:
-#role: prerequisite
-#location: https://pkg.cppget.org/1/stable
-#trust: ...
+:
+role: prerequisite
+type: git
+location: https://github.com/helmesjo/build2-Vulkan-Headers.git#review
 
-#:
-#role: prerequisite
-#location: https://git.build2.org/hello/libhello.git
+:
+role: prerequisite
+type: git
+location: https://github.com/helmesjo/build2-SPIRV-Cross.git#review
+
+:
+role: prerequisite
+type: git
+location: https://github.com/helmesjo/build2-cereal.git#review
+
+:
+role: prerequisite
+location: https://pkg.cppget.org/1/stable
