@@ -1,0 +1,19 @@
+# ICD json for Vulkan-Loader discovery. Embeds an absolute library path, so
+# relocatable installation is not supported (see ../PACKAGE-README.md).
+#
+assert (!$install.relocatable) 'relocatable installation not supported'
+
+# install.resolve() needs config.install.root. Use a placeholder for ordinary
+# dev builds. The in{} rule regenerates on install.
+#
+icd_libdir = ($null($install.root) ? [dir_path] '/unconfigured' : $install.resolve($install.lib))
+
+file{MoltenVK_icd.json}: in{MoltenVK_icd.json.in}
+file{MoltenVK_icd.json}:
+{
+  in.symbol = '@'
+  in.substitutions = CMAKE_INSTALL_FULL_LIBDIR@"$icd_libdir"
+  install = etc/vulkan/icd.d/
+}
+
+./: file{MoltenVK_icd.json}
