@@ -1,0 +1,9 @@
+: convert-noop-compute-shader
+:
+: Convert a no-op SPIR-V compute shader to MSL via convertSPIRV().
+: Requires real Metal-capable hardware. $spv is the binary fixture.
+:
+$* -q -si $spv -mo out.metal &out.metal 2>!;
+sed -n -e 's/.*(kernel void).*/\1/p' out.metal >>EOO
+kernel void
+EOO
