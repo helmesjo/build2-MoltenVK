@@ -18,4 +18,9 @@ location: https://github.com/helmesjo/build2-cereal.git#review
 
 :
 role: prerequisite
+type: git
+location: https://github.com/helmesjo/build2-Vulkan-Loader.git#review
+
+:
+role: prerequisite
 location: https://pkg.cppget.org/1/stable

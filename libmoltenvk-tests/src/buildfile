@@ -1,9 +1,12 @@
-libs =
-#import libs += libhello%lib{hello}
+import vk  = libvulkan-loader%lib{vulkan}
+import icd = libmoltenvk%json{MoltenVK_icd}
 
-exe{libmoltenvk-tests}: {hxx ixx txx cxx}{**} $libs testscript
+exe{libmoltenvk-tests}: {hxx ixx txx cxx}{**} $vk testscript
+exe{libmoltenvk-tests}: $icd: include = adhoc
 
 out_pfx = [dir_path] $out_root/src/
 src_pfx = [dir_path] $src_root/src/
 
 cxx.poptions =+ "-I$out_pfx" "-I$src_pfx"
+
+testscript{*}: icd_json = $posix_string($($icd: libmoltenvk.icd_json))
