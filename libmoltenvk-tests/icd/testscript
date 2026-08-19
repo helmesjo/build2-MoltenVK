@@ -4,8 +4,7 @@
 : VK_KHR_portability_enumeration. VK_DRIVER_FILES is set for the duration
 : of this one invocation only (Testscript env, hermetic, so it does not
 : pick up a system MoltenVK), from $icd_json (buildfile variable, see
-: ../buildfile).
-: The compiled binary never touches the environment itself. Then a compute
-: pipeline, same as tests/basics.
+: ./buildfile). The compiled binary never touches the environment itself.
+: Then a compute pipeline, same as libmoltenvk/tests/basics.
 :
 env VK_DRIVER_FILES=$icd_json -- $* 2>!

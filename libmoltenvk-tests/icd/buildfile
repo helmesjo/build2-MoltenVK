@@ -1,0 +1,7 @@
+import vk  = libvulkan-loader%lib{vulkan}
+import icd = libmoltenvk%json{MoltenVK_icd}
+
+exe{driver-icd}: {hxx ixx txx cxx}{**} ../hxx{shared} $vk testscript
+exe{driver-icd}: $icd: include = adhoc
+
+testscript{*}: icd_json = $posix_string($($icd: libmoltenvk.icd_json))
