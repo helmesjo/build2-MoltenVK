@@ -1,0 +1,8 @@
+import  vk         = libvulkan-loader%lib{vulkan}
+import  dylib_link = libmoltenvk%libs{MoltenVK}
+import! [metadata, rule_hint=cxx.link] dylib_meta = libmoltenvk%libs{MoltenVK}
+
+exe{driver-direct-driver-loading}: {hxx ixx txx cxx}{**} ../hxx{shared} $vk testscript
+exe{driver-direct-driver-loading}: $dylib_link: include = adhoc
+
+cxx.poptions += "-DMVK_DYLIB_PATH=\"$posix_string($($dylib_meta: libmoltenvk.dylib_path))\""

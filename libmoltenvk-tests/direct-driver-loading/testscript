@@ -1,0 +1,8 @@
+: create-device-and-pipeline-via-direct-driver-loading
+:
+: Create a Vulkan instance via VK_LUNARG_direct_driver_loading: dlopen
+: MoltenVK directly and hand the loader its vk_icdGetInstanceProcAddr, no
+: ICD json, no environment variable. Currently a known, tracked skip
+: (KhronosGroup/MoltenVK#2663), see driver.cpp.
+:
+$* 2>!

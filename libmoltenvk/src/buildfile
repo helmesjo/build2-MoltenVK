@@ -121,6 +121,20 @@ lib{MoltenVK}:
   cxx.export.libs = $intf_libs
 }
 
+# Dylib path for direct driver loading (VK_LUNARG_direct_driver_loading):
+# a consumer imports libs{MoltenVK} as an adhoc (not linked) prerequisite
+# to build the dylib without exposing its vk* symbols, dlopens this path
+# at runtime, and hands the loader vk_icdGetInstanceProcAddr via
+# VkDirectDriverLoadingInfoLUNARG. No ICD json, no environment variable.
+#
+libs{MoltenVK}:
+{
+  libmoltenvk.dylib_path = [path] $out_root/src/libMoltenVK.dylib
+  libmoltenvk.dylib_path.for_install = ($install.root != [null] \
+    ? [path] $install.resolve($install.lib, [dir_path])/libMoltenVK.dylib \
+    : [path])
+}
+
 # Apple system frameworks (package is macOS-only; see build/root.build).
 #
 cxx.libs += -framework Foundation -framework Metal -framework CoreGraphics \
