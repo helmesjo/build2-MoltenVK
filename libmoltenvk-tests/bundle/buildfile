@@ -1,0 +1,50 @@
+import vk         = libvulkan-loader%lib{vulkan}
+import icd_bundle = libmoltenvk%json{MoltenVK_icd-bundle}
+import dylib      = libmoltenvk%libs{MoltenVK}
+
+# A minimal .app bundle around the driver: Contents/MacOS/ for the
+# executable, Contents/Resources/vulkan/icd.d/ for the bundle json and a
+# copy of the dylib. No Info.plist: macOS's CFBundleGetMainBundle() bundle
+# detection is path-structure-based (Contents/MacOS/<exe>), not
+# metadata-based, confirmed empirically.
+#
+# Nested output directories: fsdir{}'s automatic parent creation only
+# applies out-of-tree (out_base != src_base). In-source (what dist +
+# configure + update in the unpacked archive produces), every level must
+# be its own explicit fsdir{} prerequisite. A forwarded out-of-source
+# config can hide this (leftover dirs); dist unpacks a clean in-source
+# tree.
+#
+fsdir{Driver.app/Contents/}: fsdir{Driver.app/}
+fsdir{Driver.app/Contents/MacOS/}: fsdir{Driver.app/Contents/}
+fsdir{Driver.app/Contents/Resources/}: fsdir{Driver.app/Contents/}
+fsdir{Driver.app/Contents/Resources/vulkan/}: \
+  fsdir{Driver.app/Contents/Resources/}
+fsdir{Driver.app/Contents/Resources/vulkan/icd.d/}: \
+  fsdir{Driver.app/Contents/Resources/vulkan/}
+
+macos_dir = [dir_path] Driver.app/Contents/MacOS/
+icd_dir   = [dir_path] Driver.app/Contents/Resources/vulkan/icd.d/
+
+./: Driver.app/Contents/MacOS/exe{driver-bundle}
+
+Driver.app/Contents/MacOS/exe{driver-bundle}: {hxx ixx txx cxx}{**} ../hxx{shared} $vk testscript
+Driver.app/Contents/MacOS/exe{driver-bundle}: fsdir{$macos_dir}
+
+Driver.app/Contents/Resources/vulkan/icd.d/file{MoltenVK_icd.json}: \
+  $icd_bundle fsdir{$icd_dir}
+{{
+  diag bundle-json $>
+  cp $path($<[0]) $path($>)
+}}
+
+Driver.app/Contents/Resources/vulkan/icd.d/file{libMoltenVK.dylib}: \
+  $dylib fsdir{$icd_dir}
+{{
+  diag bundle-dylib $>
+  cp $path($<[0]) $path($>)
+}}
+
+Driver.app/Contents/MacOS/exe{driver-bundle}: \
+  Driver.app/Contents/Resources/vulkan/icd.d/file{MoltenVK_icd.json} \
+  Driver.app/Contents/Resources/vulkan/icd.d/file{libMoltenVK.dylib}: include = adhoc
