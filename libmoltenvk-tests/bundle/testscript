@@ -1,0 +1,9 @@
+: create-device-and-pipeline-via-app-bundle
+:
+: Create a Vulkan instance while running from inside a .app bundle
+: structure. No VK_DRIVER_FILES, no VK_ADD_DRIVER_FILES, no application
+: code beyond the ordinary portability-enumeration flag: the loader finds
+: Contents/Resources/vulkan/icd.d/ next to this executable entirely on
+: its own. Then a compute pipeline, same as tests/basics.
+:
+$* 2>!
