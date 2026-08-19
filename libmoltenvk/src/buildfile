@@ -30,6 +30,13 @@ lib{MoltenVK}: $pub/{$pub_hdrs}
 
 # Private sources. MoltenVK/API/ is excluded: same files as public headers.
 #
+# MoltenVK/Vulkan/vulkan.mm is a manually patched copy (see .orig/.patch next
+# to it, and KhronosGroup/MoltenVK#2663): vk_icdNegotiateLoaderICDInterfaceVersion
+# caps the negotiated interface at version 5, below the version 7 the Vulkan
+# loader requires to accept a VK_LUNARG_direct_driver_loading driver (see
+# libmoltenvk-tests/direct-driver-loading/). Upstream confirmed bumping this
+# one value resolves it.
+#
 lib{MoltenVK}: Common/{h cxx m mm}{*}                  \
                MoltenVKShaderConverter/{h cxx m mm}{*} \
                MoltenVK/{h hxx cxx}{** -API/**}        \
@@ -129,9 +136,19 @@ lib{MoltenVK}:
 #
 libs{MoltenVK}:
 {
+  export.metadata = 1 libmoltenvk
+
   libmoltenvk.dylib_path = [path] $out_root/src/libMoltenVK.dylib
+
+  # Relative to $install.bin (a consumer executable's own install
+  # location), not absolute: always-relative so this stays correct
+  # under config.install.relocatable=true (see $install.resolve). An
+  # installed consumer completes this relative path at runtime by
+  # resolving the executable's path and using its directory as the
+  # base, then dlopen().
+  #
   libmoltenvk.dylib_path.for_install = ($install.root != [null] \
-    ? [path] $install.resolve($install.lib, [dir_path])/libMoltenVK.dylib \
+    ? [path] $install.resolve($install.lib, $install.bin)/libMoltenVK.dylib \
     : [path])
 }
 

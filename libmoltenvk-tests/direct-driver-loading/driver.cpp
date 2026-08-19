@@ -1,6 +1,5 @@
 #include "../shared.hpp"
 
-#include <cstdio>
 #include <dlfcn.h>
 
 // Direct driver loading (VK_LUNARG_direct_driver_loading): dlopen
@@ -50,36 +49,16 @@ main ()
   ici.enabledExtensionCount = 2;
   ici.ppEnabledExtensionNames = exts;
 
-  // MoltenVK 1.4.2 caps vk_icdNegotiateLoaderICDInterfaceVersion at 5, but
-  // the loader requires interface version 7 to accept a direct-loaded
-  // driver, so this currently fails with VK_ERROR_INCOMPATIBLE_DRIVER on
-  // every build. That is a confirmed, open upstream limitation, not a
-  // build2 or plumbing issue: see KhronosGroup/MoltenVK#2663, where a
-  // maintainer confirmed that bumping the negotiated version to 7 alone
-  // makes this exact sequence work. Treat that one specific result as a
-  // known, tracked skip rather than a test failure: it still verifies our
-  // own dlopen/dlsym/struct plumbing reached MoltenVK correctly, which
-  // any other result would not do. Once upstream fixes the negotiation
-  // and this repo picks up that version, VK_SUCCESS is the only path
-  // left and the device/pipeline exercise below runs for real.
+  // Requires ICD interface version 7 (KhronosGroup/MoltenVK#2663): see
+  // ../../libmoltenvk/src/MoltenVK/Vulkan/vulkan.mm.patch for the fix to
+  // vk_icdNegotiateLoaderICDInterfaceVersion's negotiated version.
   //
   VkInstance instance;
-  VkResult r = vkCreateInstance (&ici, nullptr, &instance);
-  if (r == VK_ERROR_INCOMPATIBLE_DRIVER)
-  {
-    fputs ("known limitation (KhronosGroup/MoltenVK#2663): "
-           "vk_icdNegotiateLoaderICDInterfaceVersion caps at 5, "
-           "loader requires 7 for direct driver loading, skipping\n",
-           stderr);
-  }
-  else
-  {
-    assert (r == VK_SUCCESS);
+  assert (vkCreateInstance (&ici, nullptr, &instance) == VK_SUCCESS);
 
-    exercise_device (instance);
+  exercise_device (instance);
 
-    vkDestroyInstance (instance, nullptr);
-  }
+  vkDestroyInstance (instance, nullptr);
 
   assert (dlclose (handle) == 0);
 }

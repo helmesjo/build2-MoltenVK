@@ -2,7 +2,7 @@
 :
 : Create a Vulkan instance via VK_LUNARG_direct_driver_loading: dlopen
 : MoltenVK directly and hand the loader its vk_icdGetInstanceProcAddr, no
-: ICD json, no environment variable. Currently a known, tracked skip
-: (KhronosGroup/MoltenVK#2663), see driver.cpp.
+: ICD json, no environment variable. Then a compute pipeline, same as
+: tests/basics.
 :
 $* 2>!
