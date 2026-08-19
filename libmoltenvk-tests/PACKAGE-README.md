@@ -19,11 +19,17 @@ create an instance with portability enumeration enabled.
 so the dylib is updated but never linked, `dlopen` it directly at
 runtime, and hand the loader `vk_icdGetInstanceProcAddr` through
 `VkInstanceCreateInfo`'s `pNext` chain. No json, no environment variable.
-Currently a known, tracked skip against MoltenVK 1.4.2
-(`vk_icdNegotiateLoaderICDInterfaceVersion` caps at interface version 5,
-the loader requires 7 for this extension), see
-[KhronosGroup/MoltenVK#2663](https://github.com/KhronosGroup/MoltenVK/issues/2663)
-and the comment in `direct-driver-loading/driver.cpp`.
+Requires ICD interface version 7, which a patched
+`libmoltenvk/src/MoltenVK/Vulkan/vulkan.mm` reports, see
+[KhronosGroup/MoltenVK#2663](https://github.com/KhronosGroup/MoltenVK/issues/2663).
+
+`bundle/`: the `.app` bundle path. Assembles a minimal bundle structure
+(`Driver.app/Contents/MacOS/driver`, no `Info.plist`) around the driver,
+with `libmoltenvk%json{MoltenVK_icd-bundle}` and a copy of the dylib
+placed in `Contents/Resources/vulkan/icd.d/`, and runs it with a
+completely empty environment. Proves the loader's `CFBundleGetMainBundle`
+bundle detection is purely path-structure-based: no `Info.plist`, no
+codesigning, no `open`/LaunchServices needed for this to work.
 
 
 ## Importable targets
