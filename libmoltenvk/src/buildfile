@@ -6,12 +6,14 @@ impl_libs = # Implementation dependencies.
 import intf_libs += libvulkan-headers%lib{vulkan-headers}
 
 # SPIRV-Cross is used only from private sources (implementation dependency).
-# Component/namespace selection is in the package manifest.
+# Component/namespace selection is in the package manifest. Import liba{}
+# explicitly: SPIRV-Cross's C++ components are static-only (upstream's C++
+# API isn't ABI-stable, only its separate C API is).
 #
-import impl_libs += libspirv-cross%lib{spirv-cross-core} \
-                     libspirv-cross%lib{spirv-cross-glsl} \
-                     libspirv-cross%lib{spirv-cross-msl}  \
-                     libspirv-cross%lib{spirv-cross-reflect}
+import impl_libs += libspirv-cross%liba{spirv-cross-core}    \
+                    libspirv-cross%liba{spirv-cross-glsl}    \
+                    libspirv-cross%liba{spirv-cross-msl}     \
+                    libspirv-cross%liba{spirv-cross-reflect}
 
 # cereal is used only from MVKPipeline.mm (pipeline cache serialization).
 # Always linked, matching upstream MVK_EXCLUDE_CEREAL default of off.
